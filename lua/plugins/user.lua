@@ -7,8 +7,12 @@
 return {
 
   -- == Examples of Adding Plugins ==
-  
-  { 'augmentcode/augment.vim' },
+
+  {
+    'augmentcode/augment.vim',
+    lazy = false,
+    priority = 1000,
+  },
 
   "andweeb/presence.nvim",
   {
@@ -90,6 +94,20 @@ return {
     build = "cd app && npm install",
     init = function()
       vim.g.mkdp_filetypes = { "markdown" }
+    end,
+    -- Force restore on update to avoid local changes conflicts
+    pin = false,
+    version = "*",
+  },
+
+  -- Ranger file manager integration
+  {
+    "kevinhwang91/rnvimr",
+    cmd = "RnvimrToggle",
+    config = function()
+      vim.g.rnvimr_draw_border = 1
+      vim.g.rnvimr_pick_enable = 1
+      vim.g.rnvimr_bw_enable = 1
     end,
   },
 }

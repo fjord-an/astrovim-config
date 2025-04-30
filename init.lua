@@ -17,23 +17,6 @@ end
 
 require "lazy_setup"
 require "polish"
-
--- Augment keybinds:
---This creates the following shortcuts:
---- `<leader>ac` - Open Augment Chat
---- `<leader>at` - Toggle Augment window
---- `<leader>af` - Focus the Augment window
---- `<leader>ah` - Hide Augment window
---- `<leader>as` - Show Augment window
---- `<leader>ar` - Resize Augment window
---- Visual mode `<leader>as` - Send selected code to Augment
-vim.keymap.set('n', '<leader>ac', '<cmd>AugmentChat<cr>', { desc = 'Open Augment Chat' })
-vim.keymap.set('n', '<leader>at', '<cmd>AugmentToggle<cr>', { desc = 'Toggle Augment Window' })
-vim.keymap.set('n', '<leader>af', '<cmd>AugmentFocus<cr>', { desc = 'Focus Augment Window' })
-vim.keymap.set('n', '<leader>ah', '<cmd>AugmentHide<cr>', { desc = 'Hide Augment Window' })
-vim.keymap.set('n', '<leader>as', '<cmd>AugmentShow<cr>', { desc = 'Show Augment Window' })
-vim.keymap.set('n', '<leader>ar', '<cmd>AugmentResize<cr>', { desc = 'Resize Augment Window' })
-
--- Visual mode mapping for sending selected code to Augment
-vim.keymap.set('v', '<leader>as', ':AugmentSend<cr>', { desc = 'Send Selection to Augment' })
-
+-- augment_workspace_folders for context
+vim.g.augment_workspace_folders =
+  { "~/Projects/", "~/Documents/augment-projects/", "~/Documents/Notes/Obsidian/Brain/Brain/Brain/" }

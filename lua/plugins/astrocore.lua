@@ -1,4 +1,4 @@
-if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
+--if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
 
 -- AstroCore provides a central place to modify mappings, vim options, autocommands, and more!
 -- Configuration documentation can be found with `:h astrocore`
@@ -60,12 +60,38 @@ return {
           desc = "Close buffer from tabline",
         },
 
+        -- Augment keymaps
+        ["<Leader>a"] = { desc = "Augment AI" },
+        ["<Leader>ac"] = { "<cmd>Augment chat<cr>", desc = "Open Augment Chat" },
+        ["<Leader>an"] = { "<cmd>Augment chat-new<cr>", desc = "Start New Augment Chat" },
+        ["<Leader>at"] = { "<cmd>Augment chat-toggle<cr>", desc = "Toggle Augment Chat Panel" },
+        ["<Leader>as"] = { "<cmd>Augment status<cr>", desc = "Augment Status" },
+        ["<Leader>al"] = { "<cmd>Augment log<cr>", desc = "Augment Log" },
+        ["<Leader>ai"] = { "<cmd>Augment signin<cr>", desc = "Augment Sign In" },
+        ["<Leader>ao"] = { "<cmd>Augment signout<cr>", desc = "Augment Sign Out" },
+        ["<Leader>ah"] = { "<cmd>help augment<cr>", desc = "Augment Help" },
+
+        -- File explorer and search
+        ["<Leader>e"] = { desc = "File Explorer" },
+        ["<Leader>er"] = { "<cmd>RnvimrToggle<cr>", desc = "Ranger File Manager" },
+
+        -- Telescope file and text search
+        ["<Leader>ff"] = { function() require("telescope.builtin").find_files() end, desc = "Find Files" },
+        ["<Leader>fg"] = { function() require("telescope.builtin").live_grep() end, desc = "Find Text" },
+        ["<Leader>fb"] = { function() require("telescope.builtin").buffers() end, desc = "Find Buffers" },
+        ["<Leader>fh"] = { function() require("telescope.builtin").help_tags() end, desc = "Find Help" },
+        ["<Leader>fr"] = { function() require("telescope.builtin").oldfiles() end, desc = "Find Recent Files" },
+
         -- tables with just a `desc` key will be registered with which-key if it's installed
         -- this is useful for naming menus
         -- ["<Leader>b"] = { desc = "Buffers" },
 
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
+      },
+      v = {
+        -- Visual mode mapping for sending selected code to Augment
+        ["<Leader>ac"] = { ":Augment chat<space>", desc = "Send Selection to Augment Chat" },
       },
     },
   },
