@@ -1,0 +1,3 @@
+[submodule "pack/augment/start/augment.vim"]
+	path = pack/augment/start/augment.vim
+	url = https://github.com/augmentcode/augment.vim.git
