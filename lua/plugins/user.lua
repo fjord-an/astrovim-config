@@ -1,4 +1,5 @@
---if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
+-- [NOTE: This line was commented differently in REMOTE vs LOCAL]
+-- if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
 
 -- You can also add or configure plugins by creating files in this `plugins/` folder
 -- Here are some examples:
@@ -19,6 +20,20 @@ return {
     "ray-x/lsp_signature.nvim",
     event = "BufRead",
     config = function() require("lsp_signature").setup() end,
+  },
+
+  -- Zellij Navigation for Nvim window/pane swapping
+  {
+  "swaits/zellij-nav.nvim",
+  lazy = true,
+  event = "VeryLazy",
+  keys = {
+    { "<c-h>", "<cmd>ZellijNavigateLeftTab<cr>",  { silent = true, desc = "navigate left or tab"  } },
+    { "<c-j>", "<cmd>ZellijNavigateDown<cr>",  { silent = true, desc = "navigate down"  } },
+    { "<c-k>", "<cmd>ZellijNavigateUp<cr>",    { silent = true, desc = "navigate up"    } },
+    { "<c-l>", "<cmd>ZellijNavigateRightTab<cr>", { silent = true, desc = "navigate right or tab" } },
+  },
+    opts = {},
   },
 
   -- == Examples of Overriding Plugins ==
@@ -46,7 +61,7 @@ return {
   },
 
   -- You can disable default plugins as follows:
-  { "max397574/better-escape.nvim", enabled = false },
+  -- { "max397574/better-escape.nvim", enabled = false },
 
   -- You can also easily customize additional setup of plugins that is outside of the plugin's setup call
   {
@@ -88,7 +103,9 @@ return {
       )
     end,
   },
-    {
+  -- ============ MERGE CONFLICT RESOLUTION ============
+  -- [REMOTE ONLY] Markdown preview plugin
+  {
     "iamcco/markdown-preview.nvim",
     event = "BufEnter *.md",
     build = "cd app && npm install",
@@ -100,7 +117,7 @@ return {
     version = "*",
   },
 
-  -- Ranger file manager integration
+  -- [REMOTE ONLY] Ranger file manager integration
   {
     "kevinhwang91/rnvimr",
     cmd = "RnvimrToggle",
@@ -109,5 +126,13 @@ return {
       vim.g.rnvimr_pick_enable = 1
       vim.g.rnvimr_bw_enable = 1
     end,
+  },
+
+  -- [LOCAL ONLY] Telescope plugin (additional config)
+  -- Note: This might be redundant as AstroNvim already includes telescope
+  {
+    'nvim-telescope/telescope.nvim', tag = '0.1.8',
+    -- or                              , branch = '0.1.x',
+    dependencies = { 'nvim-lua/plenary.nvim' }
   },
 }

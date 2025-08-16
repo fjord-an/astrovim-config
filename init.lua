@@ -17,6 +17,22 @@ end
 
 require "lazy_setup"
 require "polish"
+
 -- augment_workspace_folders for context
 vim.g.augment_workspace_folders =
   { "~/Projects/", "~/Documents/augment-projects/", "~/Documents/Notes/Obsidian/Brain/Brain/Brain/" }
+
+-- Neovide configuration
+if vim.g.neovide then
+  vim.o.guifont = "JetBrainsMono Nerd Font:h18"
+  -- Enable use of the logo (cmd/super) key for better macOS integration
+  vim.g.neovide_input_use_logo = 1
+  -- Enable Cmd+V paste in command mode
+  vim.keymap.set('c', '<D-v>', '<C-R>+')
+  -- Enable Cmd+V paste in insert mode
+  vim.keymap.set('i', '<D-v>', '<C-R>+')
+  -- Enable Cmd+C copy in visual mode
+  vim.keymap.set('v', '<D-c>', '"+y')
+  -- Enable Cmd+V paste in normal and visual modes
+  vim.keymap.set({'n', 'v'}, '<D-v>', '"+P')
+end

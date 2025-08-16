@@ -1,5 +1,3 @@
---if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
-
 -- AstroCore provides a central place to modify mappings, vim options, autocommands, and more!
 -- Configuration documentation can be found with `:h astrocore`
 -- NOTE: We highly recommend setting up the Lua Language Server (`:LspInstall lua_ls`)
@@ -32,11 +30,17 @@ return {
         spell = false, -- sets vim.opt.spell
         signcolumn = "yes", -- sets vim.opt.signcolumn to yes
         wrap = false, -- sets vim.opt.wrap
+        clipboard = "unnamed,unnamedplus", -- enable system clipboard integration
       },
       g = { -- vim.g.<key>
         -- configure global vim variables (vim.g)
         -- NOTE: `mapleader` and `maplocalleader` must be set in the AstroNvim opts or before `lazy.setup`
         -- This can be found in the `lua/lazy_setup.lua` file
+        
+        -- [LOCAL CONFIG] Augment configuration from your local changes
+        augment_workspace_folders = { vim.fn.getcwd() }, -- Add current working directory to workspace context
+        -- Uncomment the line below if you want to use a different key than Tab for accepting suggestions
+        -- augment_disable_tab_mapping = true,
       },
     },
     -- Mappings can be configured through AstroCore as well.
@@ -60,22 +64,29 @@ return {
           desc = "Close buffer from tabline",
         },
 
-        -- Augment keymaps
+        -- ============ MERGE CONFLICT RESOLUTION ============
+        -- COMBINED: Augment keymaps from both REMOTE (GitHub) and LOCAL changes
+        -- REMOTE had: signin, signout, help commands
+        -- LOCAL had: enable, disable commands and different casing (<CR> vs <cr>)
         ["<Leader>a"] = { desc = "Augment AI" },
-        ["<Leader>ac"] = { "<cmd>Augment chat<cr>", desc = "Open Augment Chat" },
-        ["<Leader>an"] = { "<cmd>Augment chat-new<cr>", desc = "Start New Augment Chat" },
+        ["<Leader>ac"] = { "<cmd>Augment chat<cr>", desc = "Open Augment Chat" }, -- [REMOTE: lowercase <cr>]
+        ["<Leader>an"] = { "<cmd>Augment chat-new<cr>", desc = "Start New Augment Chat" }, -- [REMOTE: lowercase <cr>]
         ["<Leader>at"] = { "<cmd>Augment chat-toggle<cr>", desc = "Toggle Augment Chat Panel" },
         ["<Leader>as"] = { "<cmd>Augment status<cr>", desc = "Augment Status" },
         ["<Leader>al"] = { "<cmd>Augment log<cr>", desc = "Augment Log" },
+        -- [REMOTE ONLY] Sign in/out commands
         ["<Leader>ai"] = { "<cmd>Augment signin<cr>", desc = "Augment Sign In" },
         ["<Leader>ao"] = { "<cmd>Augment signout<cr>", desc = "Augment Sign Out" },
         ["<Leader>ah"] = { "<cmd>help augment<cr>", desc = "Augment Help" },
+        -- [LOCAL ONLY] Enable/disable commands
+        ["<Leader>ae"] = { "<cmd>Augment enable<CR>", desc = "Enable Augment" },
+        ["<Leader>ad"] = { "<cmd>Augment disable<CR>", desc = "Disable Augment" },
 
-        -- File explorer and search
+        -- [REMOTE ONLY] File explorer and search
         ["<Leader>e"] = { desc = "File Explorer" },
         ["<Leader>er"] = { "<cmd>RnvimrToggle<cr>", desc = "Ranger File Manager" },
 
-        -- Telescope file and text search
+        -- [REMOTE ONLY] Telescope file and text search
         ["<Leader>ff"] = { function() require("telescope.builtin").find_files() end, desc = "Find Files" },
         ["<Leader>fg"] = { function() require("telescope.builtin").live_grep() end, desc = "Find Text" },
         ["<Leader>fb"] = { function() require("telescope.builtin").buffers() end, desc = "Find Buffers" },
@@ -90,8 +101,12 @@ return {
         -- ["<C-S>"] = false,
       },
       v = {
-        -- Visual mode mapping for sending selected code to Augment
-        ["<Leader>ac"] = { ":Augment chat<space>", desc = "Send Selection to Augment Chat" },
+        -- [LOCAL CONFIG] Visual mode mappings for Augment
+        ["<Leader>ac"] = { "<cmd>Augment chat<CR>", desc = "Augment Chat with Selection" },
+      },
+      i = {
+        -- [LOCAL CONFIG] Insert mode mappings for Augment
+        ["<C-y>"] = { "<cmd>call augment#Accept()<CR>", desc = "Accept Augment Suggestion" },
       },
     },
   },
