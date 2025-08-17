@@ -105,13 +105,20 @@ return {
   },
   -- ============ MERGE CONFLICT RESOLUTION ============
   -- [REMOTE ONLY] Markdown preview plugin
+  -- Simplified configuration to avoid build issues
   {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     ft = { "markdown" },
-    build = function() vim.fn["mkdp#util#install"]() end,
-    init = function()
+    build = function()
+      -- Manual install using npm
+      local install_cmd = "cd " .. vim.fn.stdpath("data") .. "/lazy/markdown-preview.nvim/app && npm install"
+      vim.fn.system(install_cmd)
+    end,
+    config = function()
       vim.g.mkdp_filetypes = { "markdown" }
+      vim.g.mkdp_auto_start = 0
+      vim.g.mkdp_auto_close = 1
     end,
   },
 
