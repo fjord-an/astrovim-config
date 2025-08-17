@@ -1,12 +1,12 @@
--- Fix for Mason package initialization errors
+-- Fixed Mason configuration with proper error handling
 return {
   {
     "williamboman/mason.nvim",
+    build = ":MasonUpdate", -- Update Mason registry on install/update
     opts = function(_, opts)
-      -- Completely disable package update checking to avoid errors
       opts = vim.tbl_deep_extend("force", opts or {}, {
         ui = {
-          check_outdated_packages_on_open = false, -- Disable on open
+          check_outdated_packages_on_open = true, -- Re-enable checking but with error handling
           border = "rounded",
           width = 0.8,
           height = 0.8,
@@ -16,9 +16,10 @@ return {
             package_uninstalled = "✗",
           },
         },
-        -- Disable automatic package checking
-        max_concurrent_installers = 1,
-        log_level = vim.log.levels.WARN, -- Reduce log verbosity
+        max_concurrent_installers = 4,
+        log_level = vim.log.levels.INFO,
+        -- Add PATH prepend to ensure Mason binaries are found
+        PATH = "prepend",
       })
       
       return opts
@@ -26,42 +27,73 @@ return {
     config = function(_, opts)
       require("mason").setup(opts)
       
-      -- Disable the automatic version checking that causes errors
+      -- Add error handling for registry operations
       local registry = require("mason-registry")
-      if registry.refresh then
-        -- Override refresh to prevent automatic updates
-        local original_refresh = registry.refresh
-        registry.refresh = function(...)
-          -- Only refresh when explicitly requested, not automatically
-          local ok, err = pcall(original_refresh, ...)
-          if not ok then
-            vim.notify("Mason registry refresh failed, but continuing anyway", vim.log.levels.WARN)
-          end
+      
+      -- Wrap the update handler to catch errors
+      local handle_package_updates = function()
+        local ok, err = pcall(function()
+          registry.refresh(function()
+            for _, pkg in ipairs(registry.get_installed_packages()) do
+              -- Safely check for updates
+              local success, update_err = pcall(function()
+                if pkg.check_new_version then
+                  pkg:check_new_version(function(success, result_or_err)
+                    if not success then
+                      -- Silently ignore individual package errors
+                      vim.schedule(function()
+                        vim.notify(
+                          string.format("Failed to check updates for %s: %s", pkg.name, tostring(result_or_err)),
+                          vim.log.levels.DEBUG
+                        )
+                      end)
+                    end
+                  end)
+                end
+              end)
+              if not success then
+                -- Log but don't crash on individual package errors
+                vim.schedule(function()
+                  vim.notify(
+                    string.format("Error checking package %s: %s", pkg.name or "unknown", tostring(update_err)),
+                    vim.log.levels.DEBUG
+                  )
+                end)
+              end
+            end
+          end)
+        end)
+        
+        if not ok then
+          vim.schedule(function()
+            vim.notify("Mason registry update check failed: " .. tostring(err), vim.log.levels.WARN)
+          end)
         end
       end
+      
+      -- Set up a safer auto-update check
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function()
+          vim.defer_fn(handle_package_updates, 3000) -- Delay 3 seconds after startup
+        end,
+      })
     end,
   },
   {
     "williamboman/mason-lspconfig.nvim",
     opts = {
-      automatic_installation = false, -- Prevent automatic installation issues
-      ensure_installed = {}, -- Don't automatically install anything
+      automatic_installation = true, -- Re-enable but with specific list
+      ensure_installed = {
+        "lua_ls",        -- Lua
+        "bashls",        -- Bash
+        "jsonls",        -- JSON
+        "yamlls",        -- YAML
+        "marksman",      -- Markdown
+        "html",          -- HTML
+        "cssls",         -- CSS
+        "tsserver",      -- TypeScript/JavaScript
+        "pyright",       -- Python
+      },
     },
-  },
-  {
-    "AstroNvim/astrocore",
-    opts = function(_, opts)
-      -- Disable Mason update notifications from AstroCore
-      if opts.features then
-        opts.features.mason_update_checker = false
-      end
-      
-      -- Disable the Mason auto-update checking
-      if opts.options and opts.options.g then
-        opts.options.g.astro_mason_update_check = false
-      end
-      
-      return opts
-    end,
   },
 }
