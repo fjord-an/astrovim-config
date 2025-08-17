@@ -107,14 +107,12 @@ return {
   -- [REMOTE ONLY] Markdown preview plugin
   {
     "iamcco/markdown-preview.nvim",
-    event = "BufEnter *.md",
-    build = "cd app && npm install",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = function() vim.fn["mkdp#util#install"]() end,
     init = function()
       vim.g.mkdp_filetypes = { "markdown" }
     end,
-    -- Force restore on update to avoid local changes conflicts
-    pin = false,
-    version = "*",
   },
 
   -- [REMOTE ONLY] Ranger file manager integration
