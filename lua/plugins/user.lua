@@ -103,22 +103,47 @@ return {
       )
     end,
   },
-  -- ============ MERGE CONFLICT RESOLUTION ============
-  -- [REMOTE ONLY] Markdown preview plugin
-  -- Simplified configuration to avoid build issues
+  -- ============ MARKDOWN PREVIEW ALTERNATIVES ============
+  -- Option 1: peek.nvim - Modern Deno-based previewer (recommended)
+  -- Note: Requires Deno to be installed (brew install deno)
   {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = { "markdown" },
-    build = function()
-      -- Manual install using npm
-      local install_cmd = "cd " .. vim.fn.stdpath("data") .. "/lazy/markdown-preview.nvim/app && npm install"
-      vim.fn.system(install_cmd)
-    end,
+    "toppair/peek.nvim",
+    event = { "VeryLazy" },
+    build = "deno task --quiet build:fast",
     config = function()
-      vim.g.mkdp_filetypes = { "markdown" }
-      vim.g.mkdp_auto_start = 0
-      vim.g.mkdp_auto_close = 1
+      require("peek").setup({
+        auto_load = true,         -- automatically open preview for markdown files
+        close_on_bdelete = true,  -- close preview when buffer is deleted
+        syntax = true,            -- enable syntax highlighting
+        theme = 'dark',           -- 'dark' or 'light'
+        update_on_change = true,
+        app = 'browser',          -- 'webview', 'browser', or string for custom browser
+        filetype = { 'markdown' },-- list of filetypes to preview
+        -- Throttle time for update (in ms)
+        throttle_at = 200000,     -- throttle if file is larger than this (in bytes)
+        throttle_time = 'auto',   -- minimum time between updates
+      })
+      -- Create user commands
+      vim.api.nvim_create_user_command("PeekOpen", require("peek").open, {})
+      vim.api.nvim_create_user_command("PeekClose", require("peek").close, {})
+    end,
+    enabled = false, -- Set to true after installing deno
+  },
+
+  -- Option 2: Glow integration - Terminal-based markdown viewer
+  -- Note: Requires glow to be installed (brew install glow)
+  {
+    "ellisonleao/glow.nvim",
+    cmd = "Glow",
+    ft = { "markdown" },
+    config = function()
+      require("glow").setup({
+        style = "dark", -- or "light"
+        width = 120,
+        height = 100,
+        width_ratio = 0.7,
+        height_ratio = 0.7,
+      })
     end,
   },
 
