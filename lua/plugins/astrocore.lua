@@ -27,10 +27,48 @@ return {
       opt = { -- vim.opt.<key>
         relativenumber = true, -- sets vim.opt.relativenumber
         number = true, -- sets vim.opt.number
-        spell = false, -- sets vim.opt.spell
+        spell = true, -- Enable spell checking for note-taking
         signcolumn = "yes", -- sets vim.opt.signcolumn to yes
-        wrap = false, -- sets vim.opt.wrap
+        wrap = true, -- Enable word wrap for long lines in notes
+        linebreak = true, -- Break lines at word boundaries
+        breakindent = true, -- Preserve indentation in wrapped lines
         clipboard = "unnamed,unnamedplus", -- enable system clipboard integration
+
+        -- Better for note-taking
+        conceallevel = 2, -- Hide markdown syntax for cleaner view
+        scrolloff = 8, -- Keep 8 lines visible above/below cursor
+        sidescrolloff = 8, -- Keep 8 characters visible left/right of cursor
+        cursorline = true, -- Highlight current line
+
+        -- Indentation settings for better readability
+        tabstop = 2,
+        shiftwidth = 2,
+        expandtab = true,
+        smartindent = true,
+
+        -- Search improvements
+        ignorecase = true, -- Case insensitive search
+        smartcase = true, -- Smart case search
+        hlsearch = true, -- Highlight search results
+        incsearch = true, -- Incremental search
+
+        -- File handling
+        backup = false, -- Don't create backup files
+        writebackup = false, -- Don't create backup while writing
+        swapfile = false, -- Disable swap files (with auto-save, these are annoying)
+        undofile = true, -- Enable persistent undo
+        undolevels = 10000, -- More undo levels
+
+        -- Better completion
+        completeopt = "menu,menuone,noselect",
+        pumheight = 10, -- Limit popup menu height
+
+        -- Mouse support for beginners
+        mouse = "a", -- Enable mouse in all modes
+
+        -- Better split behavior
+        splitbelow = true, -- Horizontal splits go below
+        splitright = true, -- Vertical splits go to the right
       },
       g = { -- vim.g.<key>
         -- configure global vim variables (vim.g)
@@ -84,7 +122,11 @@ return {
 
         -- [REMOTE ONLY] File explorer and search
         ["<Leader>e"] = { desc = "File Explorer" },
-        ["<Leader>er"] = { "<cmd>RnvimrToggle<cr>", desc = "Ranger File Manager" },
+        ["<Leader>er"] = { "<cmd>RnvimrToggle<cr>", desc = "Toggle Ranger" },
+        ["<Leader>ef"] = { "<cmd>RnvimrToggle<cr>", desc = "Toggle Ranger (alternative)" },
+        -- Note: <leader>ec and <leader>es are defined in user.lua with custom functions
+        ["<Leader>ec"] = { desc = "Ranger (current file - search)" },
+        ["<Leader>es"] = { desc = "Ranger (select current file exactly)" },
 
         -- [REMOTE ONLY] Telescope file and text search
         ["<Leader>ff"] = { function() require("telescope.builtin").find_files() end, desc = "Find Files" },
@@ -97,16 +139,127 @@ return {
         -- this is useful for naming menus
         -- ["<Leader>b"] = { desc = "Buffers" },
 
-        -- setting a mapping to false will disable it
-        -- ["<C-S>"] = false,
+        -- ============ BEGINNER-FRIENDLY SHORTCUTS ============
+        -- Super easy save with Ctrl+S (like every other editor)
+        ["<C-s>"] = { "<cmd>w<cr>", desc = "Save file" },
+
+        -- Quick quit with Ctrl+Q
+        ["<C-q>"] = { "<cmd>q<cr>", desc = "Quit" },
+
+        -- Escape alternative (jj is easier than reaching for Esc)
+        -- Note: This will be in insert mode below
+
+        -- Undo tree for visual undo history
+        ["<Leader>u"] = { "<cmd>UndotreeToggle<cr>", desc = "Toggle Undo Tree" },
+
+        -- Zen mode for distraction-free writing
+        ["<Leader>z"] = { "<cmd>ZenMode<cr>", desc = "Toggle Zen Mode" },
+
+        -- Obsidian note shortcuts
+        ["<Leader>o"] = { desc = "Obsidian Notes" },
+        ["<Leader>on"] = { "<cmd>ObsidianNew<cr>", desc = "New Note" },
+        ["<Leader>oo"] = { "<cmd>ObsidianOpen<cr>", desc = "Open Note" },
+        ["<Leader>os"] = { "<cmd>ObsidianSearch<cr>", desc = "Search Notes" },
+        ["<Leader>oq"] = { "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch Note" },
+        ["<Leader>ot"] = { "<cmd>ObsidianToday<cr>", desc = "Today's Note" },
+        ["<Leader>oy"] = { "<cmd>ObsidianYesterday<cr>", desc = "Yesterday's Note" },
+        ["<Leader>ob"] = { "<cmd>ObsidianBacklinks<cr>", desc = "Show Backlinks" },
+        ["<Leader>ol"] = { "<cmd>ObsidianLinks<cr>", desc = "Show Links" },
+        ["<Leader>of"] = { "<cmd>ObsidianFollowLink<cr>", desc = "Follow Link" },
+        ["<Leader>or"] = { "<cmd>ObsidianRename<cr>", desc = "Rename Note" },
+        ["<Leader>ow"] = { "<cmd>ObsidianWorkspace<cr>", desc = "Switch Workspace" },
+
+        -- Markdown/HTML Preview shortcuts
+        ["<Leader>m"] = { desc = " Markdown/Preview" },
+        ["<Leader>mp"] = { "<cmd>PeekOpen<cr>", desc = "Peek Preview (Browser)" },
+        ["<Leader>mc"] = { "<cmd>PeekClose<cr>", desc = "Peek Close" },
+        ["<Leader>mw"] = { "<cmd>W3mSplit<cr>", desc = "W3m Preview (Split)" },
+        ["<Leader>mg"] = { "<cmd>Glow<cr>", desc = "Glow Preview" },
+        ["<Leader>ml"] = { "<cmd>LiveServerStart<cr>", desc = "Start Live Server" },
+        ["<Leader>ms"] = { "<cmd>LiveServerStop<cr>", desc = "Stop Live Server" },
+        ["<Leader>mt"] = { "<cmd>LiveServerToggle<cr>", desc = "Toggle Live Server" },
+
+        -- Snippets/Cheatsheets shortcuts
+        ["<Leader>s"] = { desc = "📚 Snippets/Cheatsheets" },
+        ["<Leader>so"] = { "<cmd>CheatsheetsOpen<cr>", desc = "Open Cheatsheets" },
+        ["<Leader>sg"] = { "<cmd>CheatsheetsGrep<cr>", desc = "Search Cheatsheets" },
+        ["<Leader>sn"] = { "<cmd>CheatsheetNew<cr>", desc = "New Cheatsheet" },
+
+        -- Quick navigation (easier than remembering complex motions)
+        ["<Leader>w"] = { "<cmd>w<cr>", desc = "Save (Alternative)" },
+        ["<Leader>x"] = { "<cmd>x<cr>", desc = "Save and Quit" },
+
+        -- Search and replace made easy
+        ["<Leader>sr"] = { ":%s/", desc = "Search & Replace" },
+
+        -- Toggle line numbers (sometimes you want clean view)
+        ["<Leader>tn"] = { "<cmd>set number!<cr>", desc = "Toggle Line Numbers" },
+
+        -- Toggle word wrap for long lines
+        ["<Leader>tw"] = { "<cmd>set wrap!<cr>", desc = "Toggle Word Wrap" },
+
+        -- Center screen after search
+        ["n"] = { "nzzzv", desc = "Next search result (centered)" },
+        ["N"] = { "Nzzzv", desc = "Previous search result (centered)" },
+
+        -- Better window navigation
+        ["<C-h>"] = { "<C-w>h", desc = "Move to left window" },
+        ["<C-j>"] = { "<C-w>j", desc = "Move to bottom window" },
+        ["<C-k>"] = { "<C-w>k", desc = "Move to top window" },
+        ["<C-l>"] = { "<C-w>l", desc = "Move to right window" },
+
+        -- Quick buffer switching (like browser tabs)
+        ["<S-l>"] = { "<cmd>bnext<cr>", desc = "Next buffer" },
+        ["<S-h>"] = { "<cmd>bprevious<cr>", desc = "Previous buffer" },
+
+        -- Quick reference guide
+        ["<Leader>?"] = {
+          function()
+            vim.cmd("edit " .. vim.fn.stdpath("config") .. "/QUICK_REFERENCE.md")
+          end,
+          desc = "Open Quick Reference Guide"
+        },
+
+        -- Changelog and documentation
+        ["<Leader>cl"] = {
+          function()
+            vim.cmd("edit " .. vim.fn.stdpath("config") .. "/CHANGELOG.md")
+          end,
+          desc = "Open Changelog & Usage Guide"
+        },
       },
       v = {
         -- [LOCAL CONFIG] Visual mode mappings for Augment
         ["<Leader>ac"] = { "<cmd>Augment chat<CR>", desc = "Augment Chat with Selection" },
+
+        -- Snippets/Cheatsheets - save visual selection
+        ["<Leader>s"] = { desc = "📚 Snippets/Cheatsheets" },
+        ["<Leader>ss"] = { "<cmd>SnippetSaveMd<cr>", desc = "Save as Markdown" },
+        ["<Leader>sj"] = { "<cmd>SnippetSaveJson<cr>", desc = "Save as JSON" },
       },
       i = {
         -- [LOCAL CONFIG] Insert mode mappings for Augment
         ["<C-y>"] = { "<cmd>call augment#Accept()<CR>", desc = "Accept Augment Suggestion" },
+
+        -- ============ BEGINNER-FRIENDLY INSERT MODE ============
+        -- jj to escape (much easier than reaching for Esc)
+        ["jj"] = { "<Esc>", desc = "Exit insert mode" },
+
+        -- Ctrl+S to save while typing
+        ["<C-s>"] = { "<Esc><cmd>w<cr>a", desc = "Save and continue editing" },
+
+        -- Quick movements in insert mode
+        ["<C-h>"] = { "<Left>", desc = "Move left" },
+        ["<C-j>"] = { "<Down>", desc = "Move down" },
+        ["<C-k>"] = { "<Up>", desc = "Move up" },
+        ["<C-l>"] = { "<Right>", desc = "Move right" },
+
+        -- Quick word navigation
+        ["<C-b>"] = { "<C-Left>", desc = "Move word backward" },
+        ["<C-f>"] = { "<C-Right>", desc = "Move word forward" },
+
+        -- Delete word backward (like in most editors)
+        ["<C-BS>"] = { "<C-w>", desc = "Delete word backward" },
       },
     },
   },

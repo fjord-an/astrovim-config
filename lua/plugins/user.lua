@@ -110,6 +110,7 @@ return {
     "toppair/peek.nvim",
     event = { "VeryLazy" },
     build = "deno task --quiet build:fast",
+    ft = { "markdown", "html" },
     config = function()
       require("peek").setup({
         auto_load = true,         -- automatically open preview for markdown files
@@ -117,8 +118,8 @@ return {
         syntax = true,            -- enable syntax highlighting
         theme = 'dark',           -- 'dark' or 'light'
         update_on_change = true,
-        app = 'browser',          -- 'webview', 'browser', or string for custom browser
-        filetype = { 'markdown' },-- list of filetypes to preview
+        app = 'open -a "Floorp"', -- Use Floorp browser for preview
+        filetype = { 'markdown', 'html' }, -- list of filetypes to preview
         -- Throttle time for update (in ms)
         throttle_at = 200000,     -- throttle if file is larger than this (in bytes)
         throttle_time = 'auto',   -- minimum time between updates
@@ -127,7 +128,11 @@ return {
       vim.api.nvim_create_user_command("PeekOpen", require("peek").open, {})
       vim.api.nvim_create_user_command("PeekClose", require("peek").close, {})
     end,
-    enabled = false, -- Set to true after installing deno
+    keys = {
+      { "<leader>mp", "<cmd>PeekOpen<cr>", desc = "Peek Open (Preview)" },
+      { "<leader>mc", "<cmd>PeekClose<cr>", desc = "Peek Close" },
+    },
+    enabled = true, -- Enabled - Deno is now installed
   },
 
   -- Option 2: Glow integration - Terminal-based markdown viewer
@@ -147,14 +152,96 @@ return {
     end,
   },
 
-  -- [REMOTE ONLY] Ranger file manager integration
+  -- Ranger file manager integration (primary)
   {
     "kevinhwang91/rnvimr",
     cmd = "RnvimrToggle",
-    config = function()
+    keys = {
+      { "<leader>er", "<cmd>RnvimrToggle<cr>", desc = "Toggle Ranger" },
+      { "<leader>ef", "<cmd>RnvimrToggle<cr>", desc = "Toggle Ranger (alternative)" },
+      { 
+        "<leader>ec", 
+        function()
+          -- Open ranger and search for the current file name (fuzzy focus)
+          local current_file = vim.fn.expand('%:p')
+          if current_file ~= '' then
+            vim.cmd('RnvimrToggle')
+            -- If tmux is available, send a search keystroke to ranger
+            if os.getenv('TMUX') then
+              vim.defer_fn(function()
+                vim.fn.system('tmux send-keys -t $TMUX_PANE "/' .. vim.fn.fnamemodify(current_file, ':t') .. '" Enter')
+              end, 120)
+            end
+          else
+            vim.cmd('RnvimrToggle')
+          end
+        end,
+        desc = "Ranger (current file - search)" 
+      },
+      {
+        "<leader>es",
+        function()
+          -- Open ranger with exact current file selected via --selectfile
+          local current_file = vim.fn.expand('%:p')
+          if current_file ~= '' and vim.loop.fs_stat(current_file) then
+            local prev_cmd = vim.g.rnvimr_ranger_cmd
+            local default_cmd = prev_cmd or { 'ranger', '--cmd=set show_hidden=true' }
+            vim.g.rnvimr_ranger_cmd = { 'ranger', '--selectfile=' .. current_file, '--cmd=set show_hidden=true' }
+            vim.cmd('RnvimrToggle')
+            -- Restore default command shortly after opening
+            vim.defer_fn(function()
+              vim.g.rnvimr_ranger_cmd = default_cmd
+            end, 500)
+          else
+            vim.cmd('RnvimrToggle')
+          end
+        end,
+        desc = "Ranger (select current file exactly)"
+      },
+    },
+    init = function()
+      -- Pre-configure rnvimr settings before plugin loads
       vim.g.rnvimr_draw_border = 1
       vim.g.rnvimr_pick_enable = 1
       vim.g.rnvimr_bw_enable = 1
+      vim.g.rnvimr_enable_ex = 1
+      vim.g.rnvimr_enable_picker = 1
+      vim.g.rnvimr_hide_gitignore = 0
+      vim.g.rnvimr_enable_bw = 1
+      
+      -- Custom ranger command with choosefile option for proper integration
+      vim.g.rnvimr_ranger_cmd = { 
+        'ranger', 
+        '--cmd=set show_hidden=true',
+      }
+      
+      -- Layout configuration
+      vim.g.rnvimr_layout = {
+        relative = 'editor',
+        width = vim.o.columns,
+        height = vim.o.lines - 2,
+        col = 0,
+        row = 0,
+        style = 'minimal'
+      }
+      
+      -- Actions mapping for opening in splits/tabs
+      -- Default <Enter> will close ranger and open file in current buffer
+      vim.g.rnvimr_action = {
+        ['<C-t>'] = 'NvimEdit tabedit',
+        ['<C-x>'] = 'NvimEdit split',
+        ['<C-v>'] = 'NvimEdit vsplit',
+        ['gw'] = 'JumpNvimCwd',
+        ['yw'] = 'EmitRangerCwd'
+      }
+      
+      -- Fix for autocommand errors: Create the autocommand group if it doesn't exist
+      -- This prevents the E216 error about missing groups
+      vim.api.nvim_create_augroup('RnvimrTerm', { clear = true })
+    end,
+    config = function()
+      -- Additional runtime configuration can go here if needed
+      -- Most settings are now in init to ensure they're set before plugin loads
     end,
   },
 

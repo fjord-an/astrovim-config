@@ -91,7 +91,7 @@ return {
         "marksman",      -- Markdown
         "html",          -- HTML
         "cssls",         -- CSS
-        "tsserver",      -- TypeScript/JavaScript
+        "ts_ls",         -- TypeScript/JavaScript (renamed from tsserver)
         "pyright",       -- Python
       },
     },
