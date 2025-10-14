@@ -1,8 +1,8 @@
 return {
   "epwalsh/obsidian.nvim",
-  version = "*",  -- recommended, use latest release instead of latest commit
-  lazy = false,  -- Load immediately so commands are always available
-  priority = 100,  -- Load early
+  version = "*", -- recommended, use latest release instead of latest commit
+  lazy = false, -- Load immediately so commands are always available
+  priority = 100, -- Load early
   dependencies = {
     -- Required.
     "nvim-lua/plenary.nvim",
@@ -13,7 +13,7 @@ return {
     workspaces = {
       {
         name = "Brain",
-        path = "~/Documents/notes/Obsidian/Brain",
+        path = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/brain-preservatives/brain-preservatives-MAIN",
       },
       {
         name = "Brain2",
@@ -33,7 +33,7 @@ return {
 
     -- Daily notes configuration
     daily_notes = {
-      folder = "daily",
+      folder = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/brain-preservatives/brain-preservatives-MAIN/0-paceycapture/0-paceycapture/00-Daily Notes",
       date_format = "%Y-%m-%d",
       alias_format = "%B %-d, %Y",
       template = nil,
@@ -59,9 +59,7 @@ return {
     end,
 
     -- Follow link behavior
-    follow_url_func = function(url)
-      vim.fn.jobstart({"open", url})
-    end,
+    follow_url_func = function(url) vim.fn.jobstart { "open", url } end,
 
     -- Better search configuration
     finder = "telescope.nvim",
@@ -73,16 +71,12 @@ return {
     mappings = {
       -- Overrides the 'gf' mapping to work on markdown/wiki links within your vault.
       ["gf"] = {
-        action = function()
-          return require("obsidian").util.gf_passthrough()
-        end,
+        action = function() return require("obsidian").util.gf_passthrough() end,
         opts = { noremap = false, expr = true, buffer = true },
       },
       -- Toggle check-boxes.
       ["<leader>ch"] = {
-        action = function()
-          return require("obsidian").util.toggle_checkbox()
-        end,
+        action = function() return require("obsidian").util.toggle_checkbox() end,
         opts = { buffer = true },
       },
     },
