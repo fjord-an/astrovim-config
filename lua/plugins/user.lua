@@ -9,8 +9,12 @@ return {
   { "nvimtools/none-ls.nvim", enabled = false },
   { "jay-babu/mason-null-ls.nvim", enabled = false },
   { "augmentcode/augment.vim", enabled = false },
-
-  "andweeb/presence.nvim",
+  { "andweeb/presence.nvim", enabled = false },
+  { "mfussenegger/nvim-dap", enabled = false },
+  { "rcarriga/nvim-dap-ui", enabled = false },
+  { "jay-babu/mason-nvim-dap.nvim", enabled = false },
+  { "rcarriga/cmp-dap", enabled = false },
+  { "stevearc/resession.nvim", enabled = false },
   {
     "ray-x/lsp_signature.nvim",
     event = "BufRead",
@@ -159,23 +163,6 @@ return {
       { "<leader>mc", "<cmd>PeekClose<cr>", desc = "Peek Close" },
     },
     enabled = true, -- Enabled - Deno is now installed
-  },
-
-  -- Option 2: Glow integration - Terminal-based markdown viewer
-  -- Note: Requires glow to be installed (brew install glow)
-  {
-    "ellisonleao/glow.nvim",
-    cmd = "Glow",
-    ft = { "markdown" },
-    config = function()
-      require("glow").setup {
-        style = "dark", -- or "light"
-        width = 120,
-        height = 100,
-        width_ratio = 0.7,
-        height_ratio = 0.7,
-      }
-    end,
   },
 
 }

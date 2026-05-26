@@ -198,8 +198,6 @@ g = { -- vim.g.<key>
         ["<Leader>m"] = { desc = " Markdown/Preview" },
         ["<Leader>mp"] = { "<cmd>PeekOpen<cr>", desc = "Peek Preview (Browser)" },
         ["<Leader>mc"] = { "<cmd>PeekClose<cr>", desc = "Peek Close" },
-        ["<Leader>mw"] = { "<cmd>W3mSplit<cr>", desc = "W3m Preview (Split)" },
-        ["<Leader>mg"] = { "<cmd>Glow<cr>", desc = "Glow Preview" },
         ["<Leader>ml"] = { "<cmd>LiveServerStart<cr>", desc = "Start Live Server" },
         ["<Leader>ms"] = { "<cmd>LiveServerStop<cr>", desc = "Stop Live Server" },
         ["<Leader>mt"] = { "<cmd>LiveServerToggle<cr>", desc = "Toggle Live Server" },

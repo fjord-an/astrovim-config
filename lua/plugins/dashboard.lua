@@ -1,3 +1,5 @@
+if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
+
 -- Dashboard configuration for beginner-friendly welcome screen
 return {
   "nvimdev/dashboard-nvim",

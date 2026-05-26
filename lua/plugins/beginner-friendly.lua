@@ -30,9 +30,7 @@ return {
   -- Better search highlighting
   {
     "nvim-pack/nvim-spectre",
-    build = false,
-    cmd = "Spectre",
-    opts = { open_cmd = "noswapfile vnew" },
+    enabled = false,
   },
 
   -- Auto-save for note-taking (saves every few seconds)
