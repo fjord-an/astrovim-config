@@ -5,7 +5,7 @@
 local M = {}
 
 -- Target directory for cheatsheets/snippets
-M.CHEATSHEETS_DIR = "/Users/jordan/Library/Mobile Documents/iCloud~md~obsidian/Documents/brain-preservatives/brain-preservatives-MAIN/3-Resources/Developer-Tools-Cheatsheets"
+M.CHEATSHEETS_DIR = "/Users/jordan/Documents/3-Resources/Obsidian/brain-preservatives/brian-preservatives/3-Resources/Developer-Tools-Cheatsheets"
 
 -- ============================================================================
 -- Internal Helpers

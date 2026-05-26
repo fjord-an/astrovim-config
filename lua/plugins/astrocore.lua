@@ -70,15 +70,10 @@ return {
         splitbelow = true, -- Horizontal splits go below
         splitright = true, -- Vertical splits go to the right
       },
-      g = { -- vim.g.<key>
+g = { -- vim.g.<key>
         -- configure global vim variables (vim.g)
         -- NOTE: `mapleader` and `maplocalleader` must be set in the AstroNvim opts or before `lazy.setup`
         -- This can be found in the `lua/lazy_setup.lua` file
-        
-        -- [LOCAL CONFIG] Augment configuration from your local changes
-        augment_workspace_folders = { vim.fn.getcwd() }, -- Add current working directory to workspace context
-        -- Uncomment the line below if you want to use a different key than Tab for accepting suggestions
-        -- augment_disable_tab_mapping = true,
       },
     },
     -- Mappings can be configured through AstroCore as well.
@@ -102,26 +97,12 @@ return {
           desc = "Close buffer from tabline",
         },
 
-        -- ============ MERGE CONFLICT RESOLUTION ============
-        -- COMBINED: Augment keymaps from both REMOTE (GitHub) and LOCAL changes
-        -- REMOTE had: signin, signout, help commands
-        -- LOCAL had: enable, disable commands and different casing (<CR> vs <cr>)
-        ["<Leader>a"] = { desc = "Augment AI" },
-        ["<Leader>ac"] = { "<cmd>Augment chat<cr>", desc = "Open Augment Chat" }, -- [REMOTE: lowercase <cr>]
-        ["<Leader>an"] = { "<cmd>Augment chat-new<cr>", desc = "Start New Augment Chat" }, -- [REMOTE: lowercase <cr>]
-        ["<Leader>at"] = { "<cmd>Augment chat-toggle<cr>", desc = "Toggle Augment Chat Panel" },
-        ["<Leader>as"] = { "<cmd>Augment status<cr>", desc = "Augment Status" },
-        ["<Leader>al"] = { "<cmd>Augment log<cr>", desc = "Augment Log" },
-        -- [REMOTE ONLY] Sign in/out commands
-        ["<Leader>ai"] = { "<cmd>Augment signin<cr>", desc = "Augment Sign In" },
-        ["<Leader>ao"] = { "<cmd>Augment signout<cr>", desc = "Augment Sign Out" },
-        ["<Leader>ah"] = { "<cmd>help augment<cr>", desc = "Augment Help" },
-        -- [LOCAL ONLY] Enable/disable commands
-        ["<Leader>ae"] = { "<cmd>Augment enable<CR>", desc = "Enable Augment" },
-        ["<Leader>ad"] = { "<cmd>Augment disable<CR>", desc = "Disable Augment" },
-
         -- [REMOTE ONLY] File explorer and search
         ["<Leader>e"] = { desc = "File Explorer" },
+        ["<Leader>en"] = { "<Cmd>Neotree toggle<CR>", desc = "Toggle Neo-tree Explorer" },
+        ["<Leader>eN"] = { "<Cmd>Neotree reveal<CR>", desc = "Reveal Current File" },
+        ["<Leader>eg"] = { "<Cmd>Neotree float git_status<CR>", desc = "Git Status Explorer" },
+        ["<Leader>eb"] = { "<Cmd>Neotree float buffers<CR>", desc = "Buffer Explorer" },
         ["<Leader>er"] = { "<cmd>RnvimrToggle<cr>", desc = "Toggle Ranger" },
         ["<Leader>ef"] = { "<cmd>RnvimrToggle<cr>", desc = "Toggle Ranger (alternative)" },
         -- Note: <leader>ec and <leader>es are defined in user.lua with custom functions
@@ -146,6 +127,11 @@ return {
         -- Quick quit with Ctrl+Q
         ["<C-q>"] = { "<cmd>q<cr>", desc = "Quit" },
 
+        -- Redo mappings
+        ["<C-r>"] = { "<C-r>", desc = "Redo" },  -- Restore default redo (fixes which-key override)
+        ["<D-S-z>"] = { "<C-r>", desc = "Redo (Command-Shift-Z)" },
+        ["<D-y>"] = { "<C-r>", desc = "Redo (Command-Y)" },
+
         -- Escape alternative (jj is easier than reaching for Esc)
         -- Note: This will be in insert mode below
 
@@ -158,16 +144,55 @@ return {
         -- Obsidian note shortcuts
         ["<Leader>o"] = { desc = "Obsidian Notes" },
         ["<Leader>on"] = { "<cmd>ObsidianNew<cr>", desc = "New Note" },
-        ["<Leader>oo"] = { "<cmd>ObsidianOpen<cr>", desc = "Open Note" },
+        ["<Leader>oo"] = { "<cmd>ObsidianOpen<cr>", desc = "Open in Obsidian" },
         ["<Leader>os"] = { "<cmd>ObsidianSearch<cr>", desc = "Search Notes" },
-        ["<Leader>oq"] = { "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch Note" },
+        ["<Leader>oq"] = { "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch" },
         ["<Leader>ot"] = { "<cmd>ObsidianToday<cr>", desc = "Today's Note" },
         ["<Leader>oy"] = { "<cmd>ObsidianYesterday<cr>", desc = "Yesterday's Note" },
-        ["<Leader>ob"] = { "<cmd>ObsidianBacklinks<cr>", desc = "Show Backlinks" },
-        ["<Leader>ol"] = { "<cmd>ObsidianLinks<cr>", desc = "Show Links" },
+        ["<Leader>ob"] = { "<cmd>ObsidianBacklinks<cr>", desc = "Backlinks" },
+        ["<Leader>ol"] = { "<cmd>ObsidianLinks<cr>", desc = "Links" },
         ["<Leader>of"] = { "<cmd>ObsidianFollowLink<cr>", desc = "Follow Link" },
         ["<Leader>or"] = { "<cmd>ObsidianRename<cr>", desc = "Rename Note" },
         ["<Leader>ow"] = { "<cmd>ObsidianWorkspace<cr>", desc = "Switch Workspace" },
+        ["<Leader>om"] = { "<cmd>ObsidianTomorrow<cr>", desc = "Tomorrow's Note" },
+
+        -- Quick capture shortcuts (minimal friction)
+        ["<Leader>oc"] = {
+          function()
+            -- Open today's note and jump to Quick Capture section
+            vim.cmd("ObsidianToday")
+            vim.defer_fn(function()
+              vim.fn.search("## Quick Capture", "w")
+              vim.cmd("normal! j$")
+              vim.cmd("startinsert!")
+            end, 100)
+          end,
+          desc = "Quick Capture"
+        },
+        ["<Leader>oj"] = {
+          function()
+            -- Open today's note and jump to Journal section
+            vim.cmd("ObsidianToday")
+            vim.defer_fn(function()
+              vim.fn.search("## Journal", "w")
+              vim.cmd("normal! jo")
+              vim.cmd("startinsert")
+            end, 100)
+          end,
+          desc = "Journal Entry"
+        },
+        ["<Leader>ok"] = {
+          function()
+            -- Open today's note and jump to Tasks section
+            vim.cmd("ObsidianToday")
+            vim.defer_fn(function()
+              vim.fn.search("## Tasks", "w")
+              vim.cmd("normal! jo- [ ] ")
+              vim.cmd("startinsert!")
+            end, 100)
+          end,
+          desc = "Add Task"
+        },
 
         -- Markdown/HTML Preview shortcuts
         ["<Leader>m"] = { desc = " Markdown/Preview" },
@@ -229,18 +254,12 @@ return {
         },
       },
       v = {
-        -- [LOCAL CONFIG] Visual mode mappings for Augment
-        ["<Leader>ac"] = { "<cmd>Augment chat<CR>", desc = "Augment Chat with Selection" },
-
         -- Snippets/Cheatsheets - save visual selection
         ["<Leader>s"] = { desc = "📚 Snippets/Cheatsheets" },
         ["<Leader>ss"] = { "<cmd>SnippetSaveMd<cr>", desc = "Save as Markdown" },
         ["<Leader>sj"] = { "<cmd>SnippetSaveJson<cr>", desc = "Save as JSON" },
       },
       i = {
-        -- [LOCAL CONFIG] Insert mode mappings for Augment
-        ["<C-y>"] = { "<cmd>call augment#Accept()<CR>", desc = "Accept Augment Suggestion" },
-
         -- ============ BEGINNER-FRIENDLY INSERT MODE ============
         -- jj to escape (much easier than reaching for Esc)
         ["jj"] = { "<Esc>", desc = "Exit insert mode" },

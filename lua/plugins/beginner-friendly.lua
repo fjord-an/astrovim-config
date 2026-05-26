@@ -16,6 +16,14 @@ return {
         },
       },
       preset = "modern",
+      -- Prevent which-key from capturing <C-r> in normal mode
+      triggers = {
+        { "<auto>", mode = "nxso" },
+      },
+      defer = function(ctx)
+        -- Don't show which-key for <C-r> in normal mode (it's redo, not register)
+        return ctx.mode == "n" and ctx.keys == "<C-r>"
+      end,
     },
   },
 
@@ -112,9 +120,29 @@ return {
   -- Better markdown support
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    opts = {},
-    ft = { "markdown", "Avante" },
-    dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" },
+    version = "*", -- Pin to latest stable release
+    ft = { "markdown", "markdown.mdx", "Avante" },
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons",
+    },
+    opts = {
+      preset = "none",
+      anti_conceal = { enabled = false },
+      latex = { enabled = false },
+      code = { enabled = true, style = "full" },
+      render_modes = { "n", "c" },
+      file_types = { "markdown", "markdown.mdx", "Avante" },
+      ignore = function(buf)
+        if vim.bo[buf].buftype ~= "" then
+          return true
+        end
+        return false
+      end,
+    },
+    config = function(_, opts)
+      require("render-markdown").setup(opts)
+    end,
   },
 
   -- Smooth scrolling for better navigation

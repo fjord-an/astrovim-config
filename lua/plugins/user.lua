@@ -1,19 +1,14 @@
--- [NOTE: This line was commented differently in REMOTE vs LOCAL]
--- if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
-
 -- You can also add or configure plugins by creating files in this `plugins/` folder
 -- Here are some examples:
 
 ---@type LazySpec
 return {
 
-  -- == Examples of Adding Plugins ==
+  -- == Disabled Plugins ==
 
-  {
-    'augmentcode/augment.vim',
-    lazy = false,
-    priority = 1000,
-  },
+  { "nvimtools/none-ls.nvim", enabled = false },
+  { "jay-babu/mason-null-ls.nvim", enabled = false },
+  { "augmentcode/augment.vim", enabled = false },
 
   "andweeb/presence.nvim",
   {
@@ -22,19 +17,33 @@ return {
     config = function() require("lsp_signature").setup() end,
   },
 
-  -- Zellij Navigation for Nvim window/pane swapping
+  -- Zellij Navigation — Ctrl+hjkl seamlessly moves between nvim windows and Zellij panes
+  -- NOTE: C-a is the Zellij prefix (like tmux). Zellij intercepts C-a before nvim sees it.
+  --       Use Ctrl+x to decrement, or remap increment: vim.keymap.set('n', '<leader>i', '<C-a>')
   {
-  "swaits/zellij-nav.nvim",
-  lazy = true,
-  event = "VeryLazy",
-  keys = {
-    { "<c-h>", "<cmd>ZellijNavigateLeftTab<cr>",  { silent = true, desc = "navigate left or tab"  } },
-    { "<c-j>", "<cmd>ZellijNavigateDown<cr>",  { silent = true, desc = "navigate down"  } },
-    { "<c-k>", "<cmd>ZellijNavigateUp<cr>",    { silent = true, desc = "navigate up"    } },
-    { "<c-l>", "<cmd>ZellijNavigateRightTab<cr>", { silent = true, desc = "navigate right or tab" } },
-  },
+    "swaits/zellij-nav.nvim",
+    lazy = true,
+    event = "VeryLazy",
+    keys = {
+      { "<c-h>", "<cmd>ZellijNavigateLeftTab<cr>", { silent = true, desc = "󰌽 navigate left" } },
+      { "<c-j>", "<cmd>ZellijNavigateDown<cr>", { silent = true, desc = "󰌿 navigate down" } },
+      { "<c-k>", "<cmd>ZellijNavigateUp<cr>", { silent = true, desc = "󰌽 navigate up" } },
+      { "<c-l>", "<cmd>ZellijNavigateRightTab<cr>", { silent = true, desc = "󰌿 navigate right" } },
+      -- Convenience: launch Zellij room (fuzzy tab/pane switcher) from nvim
+      { "<leader>zr", "<cmd>!zellij action launch-or-focus-plugin room --floating<cr>", { silent = true, desc = "󰓓 Room (tab switcher)" } },
+      { "<leader>zw", "<cmd>!zellij action launch-or-focus-plugin session-manager --floating<cr>", { silent = true, desc = "󰓓 Session Manager" } },
+    },
     opts = {},
   },
+
+  -- NOTE: Aider.nvim configuration moved to lua/plugins/aider.lua for better organization
+  -- See that file for extensive keybindings and configuration
+
+  -- NOTE: CodeCompanion.nvim configuration moved to lua/plugins/codecompanion.lua
+  -- See that file for OpenCode ACP integration and keybindings
+
+  -- NOTE: File manager integrations moved to lua/plugins/file-managers.lua
+  -- See that file for rnvimr (Ranger) configuration
 
   -- == Examples of Overriding Plugins ==
 
@@ -103,6 +112,23 @@ return {
       )
     end,
   },
+
+  {
+    "stevearc/aerial.nvim",
+    branch = "master",
+    version = false,
+    opts = function(_, opts)
+      opts.ignore = opts.ignore or {}
+      opts.ignore.filetypes = opts.ignore.filetypes or {}
+      for _, filetype in ipairs({ "markdown", "markdown.mdx", "Avante" }) do
+        if not vim.tbl_contains(opts.ignore.filetypes, filetype) then
+          table.insert(opts.ignore.filetypes, filetype)
+        end
+      end
+      return opts
+    end,
+  },
+
   -- ============ MARKDOWN PREVIEW ALTERNATIVES ============
   -- Option 1: peek.nvim - Modern Deno-based previewer (recommended)
   -- Note: Requires Deno to be installed (brew install deno)
@@ -112,18 +138,18 @@ return {
     build = "deno task --quiet build:fast",
     ft = { "markdown", "html" },
     config = function()
-      require("peek").setup({
-        auto_load = true,         -- automatically open preview for markdown files
-        close_on_bdelete = true,  -- close preview when buffer is deleted
-        syntax = true,            -- enable syntax highlighting
-        theme = 'dark',           -- 'dark' or 'light'
+      require("peek").setup {
+        auto_load = true, -- automatically open preview for markdown files
+        close_on_bdelete = true, -- close preview when buffer is deleted
+        syntax = true, -- enable syntax highlighting
+        theme = "dark", -- 'dark' or 'light'
         update_on_change = true,
         app = 'open -a "Floorp"', -- Use Floorp browser for preview
-        filetype = { 'markdown', 'html' }, -- list of filetypes to preview
+        filetype = { "markdown", "html" }, -- list of filetypes to preview
         -- Throttle time for update (in ms)
-        throttle_at = 200000,     -- throttle if file is larger than this (in bytes)
-        throttle_time = 'auto',   -- minimum time between updates
-      })
+        throttle_at = 200000, -- throttle if file is larger than this (in bytes)
+        throttle_time = "auto", -- minimum time between updates
+      }
       -- Create user commands
       vim.api.nvim_create_user_command("PeekOpen", require("peek").open, {})
       vim.api.nvim_create_user_command("PeekClose", require("peek").close, {})
@@ -142,114 +168,14 @@ return {
     cmd = "Glow",
     ft = { "markdown" },
     config = function()
-      require("glow").setup({
+      require("glow").setup {
         style = "dark", -- or "light"
         width = 120,
         height = 100,
         width_ratio = 0.7,
         height_ratio = 0.7,
-      })
+      }
     end,
   },
 
-  -- Ranger file manager integration (primary)
-  {
-    "kevinhwang91/rnvimr",
-    cmd = "RnvimrToggle",
-    keys = {
-      { "<leader>er", "<cmd>RnvimrToggle<cr>", desc = "Toggle Ranger" },
-      { "<leader>ef", "<cmd>RnvimrToggle<cr>", desc = "Toggle Ranger (alternative)" },
-      { 
-        "<leader>ec", 
-        function()
-          -- Open ranger and search for the current file name (fuzzy focus)
-          local current_file = vim.fn.expand('%:p')
-          if current_file ~= '' then
-            vim.cmd('RnvimrToggle')
-            -- If tmux is available, send a search keystroke to ranger
-            if os.getenv('TMUX') then
-              vim.defer_fn(function()
-                vim.fn.system('tmux send-keys -t $TMUX_PANE "/' .. vim.fn.fnamemodify(current_file, ':t') .. '" Enter')
-              end, 120)
-            end
-          else
-            vim.cmd('RnvimrToggle')
-          end
-        end,
-        desc = "Ranger (current file - search)" 
-      },
-      {
-        "<leader>es",
-        function()
-          -- Open ranger with exact current file selected via --selectfile
-          local current_file = vim.fn.expand('%:p')
-          if current_file ~= '' and vim.loop.fs_stat(current_file) then
-            local prev_cmd = vim.g.rnvimr_ranger_cmd
-            local default_cmd = prev_cmd or { 'ranger', '--cmd=set show_hidden=true' }
-            vim.g.rnvimr_ranger_cmd = { 'ranger', '--selectfile=' .. current_file, '--cmd=set show_hidden=true' }
-            vim.cmd('RnvimrToggle')
-            -- Restore default command shortly after opening
-            vim.defer_fn(function()
-              vim.g.rnvimr_ranger_cmd = default_cmd
-            end, 500)
-          else
-            vim.cmd('RnvimrToggle')
-          end
-        end,
-        desc = "Ranger (select current file exactly)"
-      },
-    },
-    init = function()
-      -- Pre-configure rnvimr settings before plugin loads
-      vim.g.rnvimr_draw_border = 1
-      vim.g.rnvimr_pick_enable = 1
-      vim.g.rnvimr_bw_enable = 1
-      vim.g.rnvimr_enable_ex = 1
-      vim.g.rnvimr_enable_picker = 1
-      vim.g.rnvimr_hide_gitignore = 0
-      vim.g.rnvimr_enable_bw = 1
-      
-      -- Custom ranger command with choosefile option for proper integration
-      vim.g.rnvimr_ranger_cmd = { 
-        'ranger', 
-        '--cmd=set show_hidden=true',
-      }
-      
-      -- Layout configuration
-      vim.g.rnvimr_layout = {
-        relative = 'editor',
-        width = vim.o.columns,
-        height = vim.o.lines - 2,
-        col = 0,
-        row = 0,
-        style = 'minimal'
-      }
-      
-      -- Actions mapping for opening in splits/tabs
-      -- Default <Enter> will close ranger and open file in current buffer
-      vim.g.rnvimr_action = {
-        ['<C-t>'] = 'NvimEdit tabedit',
-        ['<C-x>'] = 'NvimEdit split',
-        ['<C-v>'] = 'NvimEdit vsplit',
-        ['gw'] = 'JumpNvimCwd',
-        ['yw'] = 'EmitRangerCwd'
-      }
-      
-      -- Fix for autocommand errors: Create the autocommand group if it doesn't exist
-      -- This prevents the E216 error about missing groups
-      vim.api.nvim_create_augroup('RnvimrTerm', { clear = true })
-    end,
-    config = function()
-      -- Additional runtime configuration can go here if needed
-      -- Most settings are now in init to ensure they're set before plugin loads
-    end,
-  },
-
-  -- [LOCAL ONLY] Telescope plugin (additional config)
-  -- Note: This might be redundant as AstroNvim already includes telescope
-  {
-    'nvim-telescope/telescope.nvim', tag = '0.1.8',
-    -- or                              , branch = '0.1.x',
-    dependencies = { 'nvim-lua/plenary.nvim' }
-  },
 }
