@@ -128,7 +128,11 @@ return {
       preset = "none",
       anti_conceal = { enabled = false },
       latex = { enabled = false },
-      code = { enabled = true, style = "full" },
+      code = {
+        enabled = true,
+        style = "full",
+        disable = { "dataview" },
+      },
       render_modes = { "n", "c" },
       file_types = { "markdown", "markdown.mdx", "Avante" },
       ignore = function(buf)

@@ -1,11 +1,14 @@
 return {
-  "epwalsh/obsidian.nvim",
+  -- Community fork of obsidian.nvim (actively maintained).
+  "obsidian-nvim/obsidian.nvim",
   version = "*",
   lazy = false,
   priority = 100,
   dependencies = {
     "nvim-lua/plenary.nvim",
+    "nvim-telescope/telescope.nvim", -- required for picker.name = "telescope.nvim"
   },
+
   opts = {
     workspaces = {
       {
@@ -13,15 +16,25 @@ return {
         path = "/Users/jordan/Documents/3-Resources/Obsidian/brain-preservatives/brian-preservatives",
         strict = true,
       },
+      {
+        name = "Theology",
+        path = "/Users/jordan/Documents/3-Resources/biblical-theology/",
+        strict = true,
+      },
     },
 
     notes_subdir = "notes",
 
+    -- Use new-style commands (`:Obsidian today` etc.); legacy `:ObsidianToday` form removed in 4.0.
+    legacy_commands = false,
+
     log_level = vim.log.levels.INFO,
 
-    completion = {
-      nvim_cmp = true,
-      min_chars = 2,
+    -- Link creation settings that match the Obsidian app.
+    link = {
+      style = "markdown",
+      format = "shortest",
+      auto_update = true,
     },
 
     daily_notes = {
@@ -47,22 +60,20 @@ return {
 
     new_notes_location = "notes_subdir",
 
-    note_frontmatter_func = function(note)
-      local out = { id = note.id, aliases = note.aliases, tags = note.tags }
-      if note.title then
-        note:add_alias(note.title)
-      end
-      if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
-        for k, v in pairs(note.metadata) do
-          out[k] = v
+    frontmatter = {
+      func = function(note)
+        local out = { id = note.id, aliases = note.aliases, tags = note.tags }
+        if note.title then
+          note:add_alias(note.title)
         end
-      end
-      return out
-    end,
-
-    follow_url_func = function(url) vim.fn.jobstart { "open", url } end,
-
-    preferred_link_style = "wiki",
+        if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+          for k, v in pairs(note.metadata) do
+            out[k] = v
+          end
+        end
+        return out
+      end,
+    },
 
     open_notes_in = "current",
 
@@ -78,24 +89,23 @@ return {
       },
     },
 
-    sort_by = "modified",
-    sort_reversed = true,
+    search = {
+      sort_by = "modified",
+      sort_reversed = true,
+      max_lines = 1000,
+    },
 
-    search_max_lines = 1000,
-
-    mappings = {
-      ["gf"] = {
-        action = function() return require("obsidian").util.gf_passthrough() end,
-        opts = { noremap = false, expr = true, buffer = true },
-      },
-      ["<leader>ch"] = {
-        action = function() return require("obsidian").util.toggle_checkbox() end,
-        opts = { buffer = true },
-      },
-      ["<cr>"] = {
-        action = function() return require("obsidian").util.smart_action() end,
-        opts = { buffer = true, expr = true },
-      },
+    callbacks = {
+      enter_note = function()
+        vim.keymap.set("n", "gf", function()
+          if require("obsidian.api").cursor_link() then
+            return "<cmd>Obsidian follow_link<cr>"
+          else
+            return "gf"
+          end
+        end, { noremap = false, expr = true, buffer = true, desc = "Follow link or gf" })
+        vim.keymap.set("n", "<leader>ch", "<cmd>Obsidian toggle_checkbox<cr>", { buffer = true, desc = "Toggle checkbox" })
+      end,
     },
 
     note_id_func = function(title)
@@ -110,17 +120,14 @@ return {
       return tostring(os.time()) .. "-" .. suffix
     end,
 
+    checkbox = {
+      order = { " ", "x", ">", "~", "!" },
+    },
+
     ui = {
       enable = true,
       update_debounce = 200,
       max_file_length = 5000,
-      checkboxes = {
-        [" "] = { char = "󰄱", hl_group = "ObsidianTodo" },
-        ["x"] = { char = "", hl_group = "ObsidianDone" },
-        [">"] = { char = "", hl_group = "ObsidianRightArrow" },
-        ["~"] = { char = "󰰱", hl_group = "ObsidianTilde" },
-        ["!"] = { char = "", hl_group = "ObsidianImportant" },
-      },
       bullets = { char = "•", hl_group = "ObsidianBullet" },
       external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
       reference_text = { hl_group = "ObsidianRefText" },
@@ -143,7 +150,7 @@ return {
     },
 
     attachments = {
-      img_folder = "assets/imgs",
+      folder = "assets/imgs",
     },
   },
 }

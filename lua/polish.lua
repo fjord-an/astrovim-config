@@ -15,6 +15,9 @@ vim.filetype.add {
   },
 }
 
+-- OpenCode.nvim - AI agent integration
+require("opencode").setup()
+
 -- Keybinds are defined in lua/plugins/astrocore.lua
 
 -- ============================================================================

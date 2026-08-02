@@ -26,25 +26,25 @@ return {
         header = vim.split(logo, "\n"),
         center = {
           {
-            action = "ObsidianNew",
+            action = "Obsidian new",
             desc = " New Note",
             icon = " ",
             key = "n",
           },
           {
-            action = "ObsidianQuickSwitch",
+            action = "Obsidian quick_switch",
             desc = " Quick Switch",
             icon = " ",
             key = "o",
           },
           {
-            action = "ObsidianSearch",
+            action = "Obsidian search",
             desc = " Search Notes",
             icon = " ",
             key = "s",
           },
           {
-            action = "ObsidianToday",
+            action = "Obsidian today",
             desc = " Today's Note",
             icon = " ",
             key = "t",

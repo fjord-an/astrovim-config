@@ -16,14 +16,14 @@ if not pcall(require, "lazy") then
 end
 
 require "lazy_setup"
+
 require "polish"
 
--- warp_workspace_folders for context
-vim.g.warp_workspace_folders = { "~/Projects/" }
+vim.opt.clipboard = "unnamedplus"
 
 -- Neovide configuration
 if vim.g.neovide then
-  vim.o.guifont = "JetBrainsMono Nerd Font:h16"
+  vim.o.guifont = "JetBrainsMono Nerd Font:h14"
   -- Enable use of the logo (cmd/super) key for better macOS integration
   vim.g.neovide_input_use_logo = 1
   -- Enable Cmd+V paste in command mode

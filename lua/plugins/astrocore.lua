@@ -143,24 +143,24 @@ g = { -- vim.g.<key>
 
         -- Obsidian note shortcuts
         ["<Leader>o"] = { desc = "Obsidian Notes" },
-        ["<Leader>on"] = { "<cmd>ObsidianNew<cr>", desc = "New Note" },
-        ["<Leader>oo"] = { "<cmd>ObsidianOpen<cr>", desc = "Open in Obsidian" },
-        ["<Leader>os"] = { "<cmd>ObsidianSearch<cr>", desc = "Search Notes" },
-        ["<Leader>oq"] = { "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch" },
-        ["<Leader>ot"] = { "<cmd>ObsidianToday<cr>", desc = "Today's Note" },
-        ["<Leader>oy"] = { "<cmd>ObsidianYesterday<cr>", desc = "Yesterday's Note" },
-        ["<Leader>ob"] = { "<cmd>ObsidianBacklinks<cr>", desc = "Backlinks" },
-        ["<Leader>ol"] = { "<cmd>ObsidianLinks<cr>", desc = "Links" },
-        ["<Leader>of"] = { "<cmd>ObsidianFollowLink<cr>", desc = "Follow Link" },
-        ["<Leader>or"] = { "<cmd>ObsidianRename<cr>", desc = "Rename Note" },
-        ["<Leader>ow"] = { "<cmd>ObsidianWorkspace<cr>", desc = "Switch Workspace" },
-        ["<Leader>om"] = { "<cmd>ObsidianTomorrow<cr>", desc = "Tomorrow's Note" },
+        ["<Leader>on"] = { "<cmd>Obsidian new<cr>", desc = "New Note" },
+        ["<Leader>oo"] = { "<cmd>Obsidian open<cr>", desc = "Open in Obsidian" },
+        ["<Leader>os"] = { "<cmd>Obsidian search<cr>", desc = "Search Notes" },
+        ["<Leader>oq"] = { "<cmd>Obsidian quick_switch<cr>", desc = "Quick Switch" },
+        ["<Leader>ot"] = { "<cmd>Obsidian today<cr>", desc = "Today's Note" },
+        ["<Leader>oy"] = { "<cmd>Obsidian yesterday<cr>", desc = "Yesterday's Note" },
+        ["<Leader>ob"] = { "<cmd>Obsidian backlinks<cr>", desc = "Backlinks" },
+        ["<Leader>ol"] = { "<cmd>Obsidian links<cr>", desc = "Links" },
+        ["<Leader>of"] = { "<cmd>Obsidian follow_link<cr>", desc = "Follow Link" },
+        ["<Leader>or"] = { "<cmd>Obsidian rename<cr>", desc = "Rename Note" },
+        ["<Leader>ow"] = { "<cmd>Obsidian workspace<cr>", desc = "Switch Workspace" },
+        ["<Leader>om"] = { "<cmd>Obsidian tomorrow<cr>", desc = "Tomorrow's Note" },
 
         -- Quick capture shortcuts (minimal friction)
         ["<Leader>oc"] = {
           function()
             -- Open today's note and jump to Quick Capture section
-            vim.cmd("ObsidianToday")
+            vim.cmd("Obsidian today")
             vim.defer_fn(function()
               vim.fn.search("## Quick Capture", "w")
               vim.cmd("normal! j$")
@@ -172,7 +172,7 @@ g = { -- vim.g.<key>
         ["<Leader>oj"] = {
           function()
             -- Open today's note and jump to Journal section
-            vim.cmd("ObsidianToday")
+            vim.cmd("Obsidian today")
             vim.defer_fn(function()
               vim.fn.search("## Journal", "w")
               vim.cmd("normal! jo")
@@ -184,7 +184,7 @@ g = { -- vim.g.<key>
         ["<Leader>ok"] = {
           function()
             -- Open today's note and jump to Tasks section
-            vim.cmd("ObsidianToday")
+            vim.cmd("Obsidian today")
             vim.defer_fn(function()
               vim.fn.search("## Tasks", "w")
               vim.cmd("normal! jo- [ ] ")
@@ -256,6 +256,11 @@ g = { -- vim.g.<key>
         ["<Leader>s"] = { desc = "📚 Snippets/Cheatsheets" },
         ["<Leader>ss"] = { "<cmd>SnippetSaveMd<cr>", desc = "Save as Markdown" },
         ["<Leader>sj"] = { "<cmd>SnippetSaveJson<cr>", desc = "Save as JSON" },
+
+        -- Obsidian link creation from visual selection
+        -- <Leader>ol in NORMAL still lists links; in VISUAL it links the selection.
+        ["<Leader>ol"] = { ":<C-u>Obsidian link<cr>", desc = "Link selection to note" },
+        ["<Leader>oL"] = { ":<C-u>Obsidian link_new<cr>", desc = "Create new note from selection" },
       },
       i = {
         -- ============ BEGINNER-FRIENDLY INSERT MODE ============
